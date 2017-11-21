@@ -55,15 +55,30 @@ Note:
 
 ## Samba Active Directory
 
-* (Re)Implementazione dei servizi di rete di Microsoft Active Directory&trade; <!-- .element: class="fragment" -->
+* Implementazione dei protocolli di rete di Microsoft Active Directory&trade; (DNS, LDAP, Kerberos, ...)<!-- .element: class="fragment" -->
 
-* <div>smb.conf<br><code style="font-size: smaller">server role =  active directory domain controller</code> &ndash; (DC)</div> <!-- .element: class="fragment" -->
+* Disponibile da Samba 4.0<br>rilasciata l'11 dicembre '12 <!-- .element: class="fragment" -->
 
-* Disponibile a partire da Samba 4.0.0<br>rilasciata l'11 dicembre '12 <!-- .element: class="fragment" -->
+* <div>Nuovo ruolo **domain controller** si aggiunge al già esistente *ADS* in smb.conf:<br><code style="font-size: smaller">server role = active directory domain controller</code></div> <!-- .element: class="fragment" -->
+
 
 ---
 
-### Il ruolo DC su CentOS 7
+## Samba releases <span>¹</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+
+18 mesi
+
+* 6 mesi *full support* <span>2017-03-07</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+* 6 mesi *maintenance mode* <span>2017-09-21²</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+* 6 mesi *security fixes* <span>da 2018-03, EOL 2018-09</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+
+-----
+
+¹ Esempio per la release 4.6<!-- .element: class="fragment"  data-fragment-index="1" -->
+
+² Ci sono tre release *attive*: 4.7, 4.6, 4.5<!-- .element: class="fragment"  data-fragment-index="2" -->
+
+## Il ruolo DC su CentOS 7 
 
 <span>non c'è <i class="fa fa-frown-o" aria-hidden="true"></i></span> <!-- .element: class="fragment" -->
 
@@ -88,18 +103,19 @@ I sistemi Fedora e derivati (come RHEL, CentOS) non hanno il ruolo DC disponibil
 
 (segue)
 
->  <span class="fragment strike" data-fragment-index="1">At the moment</span> the Samba Active Directory Domain Controller implementation is
+> <span class="fragment strike" data-fragment-index="1">At the moment</span> the Samba Active Directory Domain Controller implementation is
 > <span class="fragment strike" data-fragment-index="1">not</span> available with <u>MIT Kerberos</u>.
 
-Disponibile dalla 4.7 &ndash; 20 settembre '17 <!-- .element: class="fragment"  data-fragment-index="1" -->
+Ma sarà possibile quando RHEL/CentOS compileranno samba-4.7<br>
+rilasciata il 20 settembre '17<!-- .element: class="fragment"  data-fragment-index="1" -->
 
 ---
 
-### Il ruolo DC su CentOS 7 &ndash; riepilogo
+## Il ruolo DC su CentOS 7 
 
 * Disponibile RPM samba-4.6 <span>*senza DC*</span> <!-- .element: class="fragment" -->
 
-* <div>Possibile ricompilare dai sorgenti ufficiali Samba, con incluse le librerie Heimdal Kerberos
+* <div>Possibile ricompilare dai sorgenti ufficiali Samba, includendo le librerie Heimdal Kerberos
 ```text
 $ ./configure
 $ make
@@ -111,21 +127,21 @@ $ sudo make install
 
 ---
 
-### Il ruolo DC su CentOS 7 &ndash; soluzione <span class="fragment strike" data-fragment-index="1">0</span> <span class="fragment fade-in" data-fragment-index="1">0.1</span>
+## Il ruolo DC su CentOS 7 &ndash; soluzione <span class="fragment strike" data-fragment-index="1">0</span> <span class="fragment fade-in" data-fragment-index="1">0.1</span>
 
 * Ricompilare dai sorgenti ufficiali Samba
 
 * Macchina (virtuale) dedicata esclusivamente al ruolo DC <span class="fragment strike" data-fragment-index="1">+ file server</span>
 
-* Ruolo di file server su macchina separata (consigliato da Samba in siti grandi) con RPM samba-4.6 di CentOS 7<!-- .element: class="fragment"  data-fragment-index="1" -->
+* Ruolo di file server su macchina **separata** (consigliato da Samba in siti grandi) con RPM samba-4.6 di CentOS 7<!-- .element: class="fragment"  data-fragment-index="1" -->
 
 ---
 
 ### Perché separare i ruoli (1)
 
-> Su siti più grandi il sapere che il file server e il DC possono essere configurati,
+> Su installazioni più grandi il sapere che il file server e il DC possono essere configurati,
 > aggiornati e replicati in maniera indipendente sarà di lunga più importante, quindi
-> segui il nostro consiglio di separare questi ruoli. &ndash; [Andrew Bartlett](https://lists.samba.org/archive/samba/2013-March/172156.html) (Samba Team)
+> ti consiglio di separare i ruoli. &ndash; [Andrew Bartlett](https://lists.samba.org/archive/samba/2013-March/172156.html) (Samba Team)
 
 ---
 
@@ -141,7 +157,72 @@ $ sudo make install
 
 ---
 
-### Anatomia di NethServer
+### Perché separare i ruoli (3)
+
+Il ruolo di file server da solo ammette:
+
+* Posix ACL: integrazione con altre applicazioni
+
+* Windows ACL: completa compatibilità Windows
+
+Il ruolo DC accetta solo la modalità Windows ACL <!-- .element: class="fragment" -->
+
+---
+
+## Linux containers
+
+* virtualizzazione *leggera*
+
+* *chroot on steroids*
+
+* oltre 10 anni di sviluppo
+
+* i container condividono lo stesso kernel <!-- .element: class="fragment" -->
+
+---
+
+## Linux containers su CentOS 7
+
+* ``yum --installroot=/var/lib/machines/dc1 install centos-release systemd-networkd`` ...  <!-- .element: class="fragment" -->
+
+* ``systemd-nspawn --boot --machine dc1`` ...  <!-- .element: class="fragment" -->
+
+* ``systemd-run -M dc1 -t /bin/bash``  <!-- .element: class="fragment" -->
+
+---
+
+## Il ruolo DC su CentOS 7 &ndash; soluzione 1
+
+* Una macchina (fisica o virtuale) con ruolo file server, <span>RPM distro ufficiale</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+
+* Un Linux container con ruolo DC, <span>Samba ricompilato *vanilla*</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+
+* Entrambi i ruoli sullo stesso sistema, ma dall'esterno appaiono due indirizzi IP distinti <!-- .element: class="fragment"  data-fragment-index="2" -->
+
+---
+
+## Amministrazione AD su Linux
+
+* Permessi su filesystem (limitazioni)
+
+* Gestione utenti e gruppi 
+
+* Group policy
+
+---
+
+## NethServer
+
+* *all-in-one, modular server solution*
+
+* Progetto open source internazionale, nato in Italia nel 2012
+
+* Comunità molto disponibile e attiva: http://community.nethserver.org
+
+* Sysadmin Windows e/o Linux, esperti e non
+
+
+## Anatomia di NethServer
 
 |   |    | |
 | - | ------ | ------------------------ |
@@ -150,6 +231,12 @@ $ sudo make install
 | 1 | Upstream distro | CentOS 7 |
 
 ---
+
+## Active Directory su NethServer 7
+
+Installazione
+
+
 
 <i class="fa fa-database" aria-hidden="true"></i>
 
