@@ -21,9 +21,7 @@ description: |
 
 ---
 
-<b style="font-size: 1.1em">Come realizzare<br>
-un Domain Controller Active Directory<br>
-con Linux e Samba 4</b>
+# Come realizzare<br> un Domain Controller Active Directory<br> con Linux e Samba 4
 
 <i class="fa fa-database" aria-hidden="true"></i>
 
@@ -45,7 +43,7 @@ con Linux e Samba 4</b>
 
 * Disponibile Unix, OpenVMS, Unix-like...  <!-- .element: class="fragment" --> <span>(Linux)</span> <!-- .element: class="fragment" -->
 
-http://www.samba.org &ndash; fonte [wikipedia](https://en.wikipedia.org/wiki/Samba_(software)
+<div class="footnotes">http://www.samba.org &ndash; fonte [Wikipedia](https://en.wikipedia.org/wiki/Samba_(software)</div>
 
 Note:
 
@@ -64,19 +62,24 @@ Note:
 
 ---
 
-## Samba releases <span>¹</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+## Samba release cycle <span>¹</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
 
-18 mesi
-
-* 6 mesi *full support* <span>2017-03-07</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
-* 6 mesi *maintenance mode* <span>2017-09-21²</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
-* 6 mesi *security fixes* <span>da 2018-03, EOL 2018-09</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+| fase | durata | esempio |
+| ---- | ------ | ------- |
+| full support | 6 mesi | <span class="fragment"  data-fragment-index="1">2017-03-07</span> |
+| maintenance | 6 mesi | <span class="fragment"  data-fragment-index="1">2017-09-21²</span> |
+| security fixes | 6 mesi | <span class="fragment"  data-fragment-index="1">da 2018-03, EOL 2018-09</span> |
 
 -----
 
-¹ Esempio per la release 4.6<!-- .element: class="fragment"  data-fragment-index="1" -->
 
-² Ci sono tre release *attive*: 4.7, 4.6, 4.5<!-- .element: class="fragment"  data-fragment-index="2" -->
+<div class="leftalign fragment" data-fragment-index="1">¹ Esempio per la release 4.6</div>
+
+<div class="leftalign fragment" data-fragment-index="2">² Ci sono tre release *attive*: 4.7, 4.6, 4.5</div>
+
+<div class="footnotes">fonte [Samba Wiki](https://wiki.samba.org/index.php/Samba_Release_Planning)</div>
+
+---
 
 ## Il ruolo DC su CentOS 7 
 
@@ -106,12 +109,12 @@ I sistemi Fedora e derivati (come RHEL, CentOS) non hanno il ruolo DC disponibil
 > <span class="fragment strike" data-fragment-index="1">At the moment</span> the Samba Active Directory Domain Controller implementation is
 > <span class="fragment strike" data-fragment-index="1">not</span> available with <u>MIT Kerberos</u>.
 
-Ma sarà possibile quando RHEL/CentOS compileranno samba-4.7<br>
+...sarà possibile quando RHEL/CentOS compileranno samba-4.7
 rilasciata il 20 settembre '17<!-- .element: class="fragment"  data-fragment-index="1" -->
 
 ---
 
-## Il ruolo DC su CentOS 7 
+### Il ruolo DC su CentOS 7 
 
 * Disponibile RPM samba-4.6 <span>*senza DC*</span> <!-- .element: class="fragment" -->
 
@@ -127,13 +130,13 @@ $ sudo make install
 
 ---
 
-## Il ruolo DC su CentOS 7 &ndash; soluzione <span class="fragment strike" data-fragment-index="1">0</span> <span class="fragment fade-in" data-fragment-index="1">0.1</span>
+### Il ruolo DC su CentOS 7 &ndash; soluzione <span class="fragment strike" data-fragment-index="1">0</span> <span class="fragment fade-in" data-fragment-index="1">0.1</span>
 
 * Ricompilare dai sorgenti ufficiali Samba
 
 * Macchina (virtuale) dedicata esclusivamente al ruolo DC <span class="fragment strike" data-fragment-index="1">+ file server</span>
 
-* Ruolo di file server su macchina **separata** (consigliato da Samba in siti grandi) con RPM samba-4.6 di CentOS 7<!-- .element: class="fragment"  data-fragment-index="1" -->
+* Ruolo di file server su macchina separata con pacchetti distro ufficiali (RPM samba-4.6) <!-- .element: class="fragment"  data-fragment-index="1" -->
 
 ---
 
@@ -183,31 +186,71 @@ Il ruolo DC accetta solo la modalità Windows ACL <!-- .element: class="fragment
 
 ## Linux containers su CentOS 7
 
-* ``yum --installroot=/var/lib/machines/dc1 install centos-release systemd-networkd`` ...  <!-- .element: class="fragment" -->
+* Preparare filesystem<br> ``yum --installroot=/var/lib/machines/dc1 install centos-release systemd-networkd …``  <!-- .element: class="fragment smallcode" -->
 
-* ``systemd-nspawn --boot --machine dc1`` ...  <!-- .element: class="fragment" -->
+* Avviare <br> ``systemd-nspawn --boot --machine dc1 …``  <!-- .element: class="fragment smallcode" -->
 
-* ``systemd-run -M dc1 -t /bin/bash``  <!-- .element: class="fragment" -->
+* Ottenere una shell <br> ``systemd-run -M dc1 -t /bin/bash``  <!-- .element: class="fragment smallcode" -->
 
 ---
 
-## Il ruolo DC su CentOS 7 &ndash; soluzione 1
+### Il ruolo DC su CentOS 7 &ndash; soluzione 1
 
 * Una macchina (fisica o virtuale) con ruolo file server, <span>RPM distro ufficiale</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
 
-* Un Linux container con ruolo DC, <span>Samba ricompilato *vanilla*</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
+* Un Linux container con ruolo DC, <span>[Samba DC ricompilato](https://github.com/NethServer/ns-samba/releases)</span> <!-- .element: class="fragment"  data-fragment-index="1" -->
 
-* Entrambi i ruoli sullo stesso sistema, ma dall'esterno appaiono due indirizzi IP distinti <!-- .element: class="fragment"  data-fragment-index="2" -->
+* Molti ruoli sullo stesso sistema <!-- .element: class="fragment"  data-fragment-index="2" -->
+
+* Dall'esterno appaiono due indirizzi IP distinti <!-- .element: class="fragment"  data-fragment-index="2" -->
 
 ---
 
 ## Amministrazione AD su Linux
 
-* Permessi su filesystem (limitazioni)
+* Permessi filesystem
 
-* Gestione utenti e gruppi 
+* [RSAT tools](https://wiki.samba.org/index.php/Installing_RSAT)
 
-* Group policy
+  * Gestione utenti
+
+  * Criteri di gruppo (group policy object &ndash; GPO)
+
+  * Gestione DNS
+
+
+
+---
+
+### Permessi filesystem
+
+![Permessi filesystem](./img/PermessiFilesystem.png)
+
+---
+
+### Gestione utenti
+
+![Gestione utenti e computer](./img/UtentiEComputer.png)
+
+---
+
+### Criteri di gruppo
+
+* I GPO non si applicano al Samba DC stesso
+
+* Non è implementato un meccanismo di replica di SYSVOL
+
+![Criteri di gruppo](./img/CreazioneGPO.png)
+
+<div class="footnotes">rif. [Samba Wiki](https://wiki.samba.org/index.php/DNS_Administration)</div>
+
+---
+
+### Gestione DNS
+
+![Gestione DNS](./img/DNSManager.png)
+
+<div class="footnotes">rif. [Samba Wiki](https://wiki.samba.org/index.php/DNS_Administration)</div>
 
 ---
 
@@ -217,10 +260,11 @@ Il ruolo DC accetta solo la modalità Windows ACL <!-- .element: class="fragment
 
 * Progetto open source internazionale, nato in Italia nel 2012
 
-* Comunità molto disponibile e attiva: http://community.nethserver.org
+* Comunità di sysadmin Windows e/o Linux, esperti&nbsp;e&nbsp;non, inclusiva e attiva<br> http://community.nethserver.org
 
-* Sysadmin Windows e/o Linux, esperti e non
 
+
+---
 
 ## Anatomia di NethServer
 
@@ -234,9 +278,15 @@ Il ruolo DC accetta solo la modalità Windows ACL <!-- .element: class="fragment
 
 ## Active Directory su NethServer 7
 
-Installazione
+![Scelta del ruolo](./img/NethServer-ActiveDirectory.png)
 
+---
 
+## Active Directory su NethServer 7
+
+![Configurazione DC](./img/NethServer-ActiveDirectory-2.png)
+
+---
 
 <i class="fa fa-database" aria-hidden="true"></i>
 

@@ -7,8 +7,21 @@
     text-transform:none;
 }
 
-#moving-to-the-next-nethserver-ui {
+#come-realizzare-br-un-domain-controller-active-directory-br-con-linux-e-samba-4 {
     font-size: 1.2em;
+}
+
+.smallcode {
+    font-size: 80% !important;
+}
+
+.leftalign {
+    text-align: left;
+}
+
+.footnotes {
+    font-size: 70% !important;
+    text-align: right;
 }
 
 .line-through {
