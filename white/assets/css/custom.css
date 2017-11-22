@@ -1,0 +1,29 @@
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 {
+    text-transform:none;
+}
+
+#come-realizzare-br-un-domain-controller-active-directory-br-con-linux-e-samba-4 {
+    font-size: 1.2em;
+}
+
+.smallcode {
+    font-size: 80% !important;
+}
+
+.leftalign {
+    text-align: left;
+}
+
+.footnotes {
+    font-size: 70% !important;
+    text-align: right;
+}
+
+.line-through {
+    text-decoration: line-through;
+}
